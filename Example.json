@@ -1,0 +1,69 @@
+{
+	"project_name": "Engage",
+	"machines": {
+        "Linux": {
+            "start-cmd": null,
+            "stop-cmd": null,
+            "delay-after-boot": 0,
+            "network-connection": null
+        },
+        "VMware-machine": {
+            "start-cmd": "xvfb-run vmrun -T player start \"PathToVmx.vmx\"",
+            "stop-cmd": "vmrun -T player suspend \"PathToVmx.vmx\"",
+            "delay-after-boot": 2,
+            "network-connection": {
+                "ip": "192.168.0.1",
+                "port": 22,
+                "user": "user",
+                "non-unix-cmds": null
+            }
+        },
+        "VMware-non-Unix": {
+            "start-cmd": "xvfb-run vmrun -T player start \"PathToNonUnix.vmx\"",
+            "stop-cmd": "vmrun -T player suspend \"PathToNonUnix.vmx\"",
+            "delay-after-boot": 2,
+            "network-connection": {
+                "ip": "192.168.0.2",
+                "port": 22,
+                "user": "user",
+                "non-unix-cmds": {
+                    "test-dir-cmd": "test -d",
+                    "rm-dir-cmd": "rm -r",
+                    "mk-dir-cmd": "mkdir -p"
+                }
+            }
+        }
+    },
+	"config": {
+		"Linux": {
+			"machine": "Linux",
+			"project-dir": "/Path/To/Project",
+			"build-dir": "/Path/To/Project/build",
+			"git-source": "https://mygitrepo.com/Project.git",
+			"rmdir-before-build": true,
+			"build-cmds": [
+        			"cmake -DCMAKE_BUILD_TYPE=Debug ..",
+        			"make"]
+		},
+		"Xcode": {
+			"machine": "VMware-machine",
+			"project-dir": "/Path/To/Project",
+			"build-dir": "/Path/To/Project/build",
+			"git-source": "https://mygitrepo.com/Project.git",
+			"rmdir-before-build": true,
+			"build-cmds": [
+        			"/Applications/CMake.app/Contents/bin/cmake -G\"Xcode\" ..",
+        			"xcodebuild -project Project.xcodeproj -target Project -configuration Debug build"]
+		},
+		"VisualStudio": {
+			"machine": "VMware-non-Unix",
+			"project-dir": "/cygdrive/c/Path/To/Project",
+			"build-dir": "/cygdrive/c/Path/To/Project/build",
+			"git-source": "https://mygitrepo.com/Project.git",
+			"rmdir-before-build": true,
+			"build-cmds": [
+        			"cmake -G\"Visual Studio 15 2017 Win64\" ..",
+        			"/cygdrive/c/Program\\ Files\\ \\(x86\\)/Microsoft\\ Visual\\ Studio/2017/Community/MSBuild/15.0/Bin/MSBuild.exe Project.sln /m /p:Configuration=Debug"]
+		}
+	}
+}
