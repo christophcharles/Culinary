@@ -4,18 +4,6 @@ import pathlib
 import shutil
 import time
 
-def start_machine(machines_info, machine):
-    if machines_info[machine]["start-cmd"]:
-        return os.system(machines_info[machine]["start-cmd"]) == 0
-    if machines_info[machine]["delay-after-boot"] != 0:
-        time.sleep(machines_info[machine]["delay-after-boot"])
-    return True
-
-def stop_machine(machines_info, machine):
-    if machines_info[machine]["stop-cmd"]:
-        return os.system(machines_info[machine]["stop-cmd"]) == 0
-    return True
-
 def execute_command_on_machine(machines_info, machine, cmd):
     if machines_info[machine]["network-connection"] != None:
         connection_info = machines_info[machine]["network-connection"]
@@ -29,6 +17,33 @@ def execute_command_on_machine(machines_info, machine, cmd):
         return os.system(cmdline)
     else:
         return os.system(cmd)
+
+def test_connection(machines_info, machine):
+    testconnectioncmd = "pwd"
+    if machines_info[machine]["network-connection"] != None:
+        if machines_info[machine]["network-connection"]["non-unix-cmds"] != None:
+            testconnectioncmd = machines_info[machine]["network-connection"]["non-unix-cmds"]["connection-attempt"]
+    return (execute_command_on_machine(machines_info, machine, testconnectioncmd) == 0)
+
+def start_machine(machines_info, machine):
+    if machines_info[machine]["start-cmd"]:
+        if os.system(machines_info[machine]["start-cmd"]) != 0:
+            return False
+    if machines_info[machine]["delay-after-boot"] != 0:
+        time.sleep(machines_info[machine]["delay-after-boot"])
+    if machines_info[machine]["connection-attempt-count"] != 0:
+        remaining_attempts = machines_info[machine]["connection-attempt-count"]
+        success = False
+        while (not success) and (remaining_attempts > 0):
+            success = test_connection(machines_info, machine)
+            remaining_attempts = remaining_attempts -1;
+        return success
+    return True
+
+def stop_machine(machines_info, machine):
+    if machines_info[machine]["stop-cmd"]:
+        return os.system(machines_info[machine]["stop-cmd"]) == 0
+    return True
 
 def test_directory_exists(machines_info, config_info, directory):
     machine = config_info["machine"]

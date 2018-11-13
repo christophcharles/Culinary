@@ -5,12 +5,14 @@
             "start-cmd": null,
             "stop-cmd": null,
             "delay-after-boot": 0,
+            "connection-attempt-count": 0,
             "network-connection": null
         },
         "VMware-machine": {
             "start-cmd": "xvfb-run vmrun -T player start \"PathToVmx.vmx\"",
             "stop-cmd": "vmrun -T player suspend \"PathToVmx.vmx\"",
             "delay-after-boot": 2,
+            "connection-attempt-count": 3,
             "network-connection": {
                 "ip": "192.168.0.1",
                 "port": 22,
@@ -22,6 +24,7 @@
             "start-cmd": "xvfb-run vmrun -T player start \"PathToNonUnix.vmx\"",
             "stop-cmd": "vmrun -T player suspend \"PathToNonUnix.vmx\"",
             "delay-after-boot": 2,
+            "connection-attempt-count": 3,
             "network-connection": {
                 "ip": "192.168.0.2",
                 "port": 22,
@@ -29,7 +32,8 @@
                 "non-unix-cmds": {
                     "test-dir-cmd": "test -d",
                     "rm-dir-cmd": "rm -r",
-                    "mk-dir-cmd": "mkdir -p"
+                    "mk-dir-cmd": "mkdir -p",
+                    "connection-attempt": "pwd"
                 }
             }
         }

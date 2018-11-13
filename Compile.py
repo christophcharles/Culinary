@@ -7,6 +7,18 @@ import CmdLine
 import JsonInfo
 import Machine
 
+class Unbuffered(object):
+   def __init__(self, stream):
+       self.stream = stream
+   def write(self, data):
+       self.stream.write(data)
+       self.stream.flush()
+   def writelines(self, datas):
+       self.stream.writelines(datas)
+       self.stream.flush()
+   def __getattr__(self, attr):
+       return getattr(self.stream, attr)
+
 def select_configurations(project_info, configs):
     results = {}
     
@@ -50,6 +62,7 @@ def format_time(seconds):
             return format_plural(seconds,"second")
 
 def main():
+    sys.stdout = Unbuffered(sys.stdout)
     try:
         parameters = CmdLine.analyse_cmdline(sys.argv)
         if len(parameters) == 0:

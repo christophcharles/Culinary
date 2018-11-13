@@ -12,13 +12,19 @@ def validate_machine(name, machine_info):
         raise Exception("Invalid machine \""+name+"\": missing stop-cmd parameter")
     if "network-connection" not in machine_info:
         raise Exception("Invalid machine \""+name+"\": missing network-connection parameter")
-    if len(machine_info) != 4:
+    if "connection-attempt-count" not in machine_info:
+        raise Exception("Invalid machine \""+name+"\": missing connection-attempt-count parameter")
+    if len(machine_info) != 5:
         raise Exception("Invalid machine \""+name+"\": unkown extra parameters")
     
     if machine_info["start-cmd"] != None and not isinstance(machine_info["start-cmd"], str):
         raise Exception("Invalid machine \""+name+"\": start-cmd must be a string or null")
     if machine_info["stop-cmd"] != None and not isinstance(machine_info["stop-cmd"], str):
         raise Exception("Invalid machine \""+name+"\": stop-cmd must be a string or null")
+    if not isinstance(machine_info["delay-after-boot"], int):
+        raise Exception("Invalid machine \""+name+"\": delay-after-boot must be a number (of seconds)")
+    if not isinstance(machine_info["connection-attempt-count"], int):
+        raise Exception("Invalid machine \""+name+"\": connection-attempt-count must be a number")
     if machine_info["network-connection"] != None:
         if not isinstance(machine_info["network-connection"], dict):
             raise Exception("Invalid machine \""+name+"\": network-connection must either be null or a json object")
@@ -68,7 +74,9 @@ def validate_machine(name, machine_info):
                 raise Exception("Invalid machine \""+name+"\": non-unix-cmds (in network-connection) must contain a field \"rm-dir-cmd\"")
             if "mk-dir-cmd" not in Cmds:
                 raise Exception("Invalid machine \""+name+"\": non-unix-cmds (in network-connection) must contain a field \"mk-dir-cmd\"")
-            if len(Cmds) != 3:
+            if "connection-attempt" not in Cmds:
+                raise Exception("Invalid machine \""+name+"\": non-unix-cmds (in network-connection) must contain a field \"connection-attempt\"")
+            if len(Cmds) != 4:
                 raise Exception("Invalid machine \""+name+"\": unknown extra field in non-unix-cmds")
                 
             if not isinstance(Cmds["test-dir-cmd"], str):
