@@ -18,29 +18,32 @@ def execute_command_on_machine(machines_info, machine, cmd):
     else:
         return os.system(cmd)
 
-def test_connection(machines_info, machine):
+def test_connection_once(machines_info, machine):
     testconnectioncmd = "pwd"
     if machines_info[machine]["network-connection"] != None:
         if machines_info[machine]["network-connection"]["non-unix-cmds"] != None:
             testconnectioncmd = machines_info[machine]["network-connection"]["non-unix-cmds"]["connection-attempt"]
     return (execute_command_on_machine(machines_info, machine, testconnectioncmd) == 0)
 
-def start_machine(machines_info, machine):
-    if machines_info[machine]["start-cmd"]:
-        if os.system(machines_info[machine]["start-cmd"]) != 0:
-            return False
+def test_connection_to_machine(machines_info, machine):
     if machines_info[machine]["connection-attempt-count"] != 0:
         remaining_attempts = machines_info[machine]["connection-attempt-count"]
         success = False
         while (not success) and (remaining_attempts > 0):
             if machines_info[machine]["delay-after-boot"] != 0:
                 time.sleep(machines_info[machine]["delay-after-boot"])
-            success = test_connection(machines_info, machine)
+            success = test_connection_once(machines_info, machine)
             remaining_attempts = remaining_attempts -1
         return success
     else:
         if machines_info[machine]["delay-after-boot"] != 0:
             time.sleep(machines_info[machine]["delay-after-boot"])
+        return True
+
+def start_machine(machines_info, machine):
+    if machines_info[machine]["start-cmd"]:
+        if os.system(machines_info[machine]["start-cmd"]) != 0:
+            return False
     return True
 
 def stop_machine(machines_info, machine):

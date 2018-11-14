@@ -100,16 +100,22 @@ def main():
                     total = total+1
                     successful_details[config] = (False, 0)
                 continue
-            
-            for config, desc in dic.items():
-                print("  -> Compiling configuration \""+config+"\"...")
-                begin_local = time.perf_counter()
-                successful_local = Machine.compile_config(project_info["machines"], desc, parameters[1])
-                end_local = time.perf_counter()
-                total = total + 1
-                successful_details[config] = (successful_local, end_local-begin_local)
-                if successful_local:
-                    successful = successful + 1
+            print("  -> Testing connection")
+            if not Machine.test_connection_to_machine(project_info["machines"], machine):
+                print("     FAILED to connect to machine")
+                for config, desc in dic.items():
+                    total = total+1
+                    successful_details[config] = (False, 0)
+            else:
+                for config, desc in dic.items():
+                    print("  -> Compiling configuration \""+config+"\"...")
+                    begin_local = time.perf_counter()
+                    successful_local = Machine.compile_config(project_info["machines"], desc, parameters[1])
+                    end_local = time.perf_counter()
+                    total = total + 1
+                    successful_details[config] = (successful_local, end_local-begin_local)
+                    if successful_local:
+                        successful = successful + 1
             
             print("  -> Stopping machine")
             if not Machine.stop_machine(project_info["machines"], machine):
