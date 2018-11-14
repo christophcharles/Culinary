@@ -29,15 +29,18 @@ def start_machine(machines_info, machine):
     if machines_info[machine]["start-cmd"]:
         if os.system(machines_info[machine]["start-cmd"]) != 0:
             return False
-    if machines_info[machine]["delay-after-boot"] != 0:
-        time.sleep(machines_info[machine]["delay-after-boot"])
     if machines_info[machine]["connection-attempt-count"] != 0:
         remaining_attempts = machines_info[machine]["connection-attempt-count"]
         success = False
         while (not success) and (remaining_attempts > 0):
+            if machines_info[machine]["delay-after-boot"] != 0:
+                time.sleep(machines_info[machine]["delay-after-boot"])
             success = test_connection(machines_info, machine)
-            remaining_attempts = remaining_attempts -1;
+            remaining_attempts = remaining_attempts -1
         return success
+    else:
+        if machines_info[machine]["delay-after-boot"] != 0:
+            time.sleep(machines_info[machine]["delay-after-boot"])
     return True
 
 def stop_machine(machines_info, machine):
