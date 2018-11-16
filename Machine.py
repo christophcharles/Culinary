@@ -99,8 +99,8 @@ def create_directory(machines_info, config_info, directory):
             return False
         return True
 
-def update_source(machines_info, config_info):
-    cmd = "cd \'" + config_info["project-dir"] + "\' ; git pull origin"
+def update_source(machines_info, config_info, branch):
+    cmd = "cd \'" + config_info["project-dir"] + "\' ; git pull origin \'" + branch + "\'"
     return execute_command_on_machine(machines_info, config_info["machine"], cmd) == 0
 
 def download_source(machines_info, config_info):
@@ -141,7 +141,7 @@ def execute_build_commands(machines_info, config_info):
 
 def compile_config(machines_info, config_info, branch):
     if test_directory_exists(machines_info, config_info, config_info["project-dir"]):
-        if not update_source(machines_info, config_info):
+        if not update_source(machines_info, config_info, branch):
             print("Error while updating")
             return False
     else:
